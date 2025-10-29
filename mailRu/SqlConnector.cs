@@ -54,7 +54,7 @@ namespace mailRu
 
         public void Read(string sql, Action<SqlDataReader> processRow)
         {
-            if (connection.State != System.Data.ConnectionState.Open)
+            if (connection.State != ConnectionState.Open)
             {
                 Open();
             }
@@ -74,7 +74,7 @@ namespace mailRu
 
         public void Push(string sql, Action<SqlCommand> configureCommand)
         {
-            if (connection.State != System.Data.ConnectionState.Open)
+            if (connection.State != ConnectionState.Open)
             {
                 Open();
             }

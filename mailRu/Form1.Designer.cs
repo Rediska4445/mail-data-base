@@ -35,9 +35,10 @@
             this.buttosList = new System.Windows.Forms.ListBox();
             this.request = new System.Windows.Forms.RichTextBox();
             this.save = new System.Windows.Forms.Button();
-            this.close = new System.Windows.Forms.Button();
+            this.remove = new System.Windows.Forms.Button();
             this.commandLine = new System.Windows.Forms.RichTextBox();
             this.sqlDataAdapter1 = new Microsoft.Data.SqlClient.SqlDataAdapter();
+            this.update = new System.Windows.Forms.Button();
             this.left_side.SuspendLayout();
             this.right_side.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -45,10 +46,11 @@
             // 
             // left_side
             // 
+            this.left_side.Controls.Add(this.request);
             this.left_side.Controls.Add(this.buttosList);
             this.left_side.Location = new System.Drawing.Point(12, 12);
             this.left_side.Name = "left_side";
-            this.left_side.Size = new System.Drawing.Size(202, 310);
+            this.left_side.Size = new System.Drawing.Size(202, 384);
             this.left_side.TabIndex = 0;
             // 
             // right_side
@@ -56,20 +58,21 @@
             this.right_side.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.right_side.Controls.Add(this.update);
             this.right_side.Controls.Add(this.commandLine);
-            this.right_side.Controls.Add(this.close);
+            this.right_side.Controls.Add(this.remove);
             this.right_side.Controls.Add(this.save);
             this.right_side.Controls.Add(this.dataGridView1);
             this.right_side.Location = new System.Drawing.Point(220, 12);
             this.right_side.Name = "right_side";
-            this.right_side.Size = new System.Drawing.Size(589, 424);
+            this.right_side.Size = new System.Drawing.Size(589, 509);
             this.right_side.TabIndex = 1;
             // 
             // console
             // 
-            this.console.Location = new System.Drawing.Point(12, 328);
+            this.console.Location = new System.Drawing.Point(15, 407);
             this.console.Name = "console";
-            this.console.Size = new System.Drawing.Size(202, 110);
+            this.console.Size = new System.Drawing.Size(202, 114);
             this.console.TabIndex = 2;
             this.console.Text = "";
             // 
@@ -92,13 +95,13 @@
             "Newspapers"});
             this.buttosList.Location = new System.Drawing.Point(3, 3);
             this.buttosList.Name = "buttosList";
-            this.buttosList.Size = new System.Drawing.Size(196, 264);
+            this.buttosList.Size = new System.Drawing.Size(196, 342);
             this.buttosList.TabIndex = 1;
             this.buttosList.SelectedIndexChanged += new System.EventHandler(this.buttosList_SelectedIndexChanged);
             // 
             // request
             // 
-            this.request.Location = new System.Drawing.Point(15, 285);
+            this.request.Location = new System.Drawing.Point(3, 347);
             this.request.Name = "request";
             this.request.Size = new System.Drawing.Size(196, 34);
             this.request.TabIndex = 3;
@@ -107,23 +110,23 @@
             // save
             // 
             this.save.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.save.Location = new System.Drawing.Point(13, 388);
+            this.save.Location = new System.Drawing.Point(13, 473);
             this.save.Name = "save";
-            this.save.Size = new System.Drawing.Size(280, 33);
+            this.save.Size = new System.Drawing.Size(564, 33);
             this.save.TabIndex = 1;
-            this.save.Text = "Save";
+            this.save.Text = "Insert";
             this.save.UseVisualStyleBackColor = true;
             this.save.Click += new System.EventHandler(this.save_Click);
             // 
-            // close
+            // remove
             // 
-            this.close.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.close.Location = new System.Drawing.Point(299, 388);
-            this.close.Name = "close";
-            this.close.Size = new System.Drawing.Size(276, 33);
-            this.close.TabIndex = 2;
-            this.close.Text = "Close";
-            this.close.UseVisualStyleBackColor = true;
+            this.remove.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.remove.Location = new System.Drawing.Point(13, 434);
+            this.remove.Name = "remove";
+            this.remove.Size = new System.Drawing.Size(564, 33);
+            this.remove.TabIndex = 2;
+            this.remove.Text = "Remove";
+            this.remove.UseVisualStyleBackColor = true;
             // 
             // commandLine
             // 
@@ -135,12 +138,21 @@
             this.commandLine.TabIndex = 4;
             this.commandLine.Text = "";
             // 
+            // update
+            // 
+            this.update.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.update.Location = new System.Drawing.Point(13, 395);
+            this.update.Name = "update";
+            this.update.Size = new System.Drawing.Size(564, 33);
+            this.update.TabIndex = 5;
+            this.update.Text = "Update";
+            this.update.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(821, 448);
-            this.Controls.Add(this.request);
+            this.ClientSize = new System.Drawing.Size(821, 533);
             this.Controls.Add(this.console);
             this.Controls.Add(this.right_side);
             this.Controls.Add(this.left_side);
@@ -162,9 +174,10 @@
         private System.Windows.Forms.ListBox buttosList;
         private System.Windows.Forms.RichTextBox request;
         private System.Windows.Forms.RichTextBox commandLine;
-        private System.Windows.Forms.Button close;
+        private System.Windows.Forms.Button remove;
         private System.Windows.Forms.Button save;
         private Microsoft.Data.SqlClient.SqlDataAdapter sqlDataAdapter1;
+        private System.Windows.Forms.Button update;
     }
 }
 

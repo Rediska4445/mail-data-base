@@ -4,10 +4,17 @@ use Mail;
 create table printing_house (id int primary key not null, addr varchar(96));
 
 -- Газетка
-create table newspaper (id int primary key not null, title varchar(64), edition_code varchar(64), price int not null, full_name varchar(96) not null, foreign key (id) references printing_house(id), number int);
+create table newspaper (id int primary key not null, title varchar(64), edition_code varchar(64), price int not null, full_name varchar(96) not null, printing_house int null, foreign key (printing_house) references printing_house(id), number int);
 
 -- Почта (TODO: изменить main на mail)
-create table main (id int primary key not null, addr varchar(96), foreign key (id) references newspaper(id), number_newspaper int);
+create table main (id int primary key not null, addr varchar(96), newspaper_id int, foreign key (newspaper_id) references newspaper(newspaper_id), number_newspaper int);
+
+ALTER TABLE main DROP CONSTRAINT FK__main__id__29572725;
+
+ALTER TABLE main ADD newspaper_id int NULL;
+
+ALTER TABLE main
+ADD CONSTRAINT FK_main_newspaper FOREIGN KEY (newspaper_id) REFERENCES newspaper(id);
 
 -- Мок для типографии
 INSERT INTO printing_house (id, addr) VALUES
@@ -29,28 +36,12 @@ INSERT INTO main (id, addr, number_newspaper) VALUES
 
 -- Тесты
 -- Газета
-SELECT
-    ph.id AS printing_house_id,
-    ph.addr AS printing_house_addr,
-    np.title AS newspaper_title,
-    np.edition_code,
-    np.price,
-    np.full_name,
-    np.number,
-    m.addr AS main_addr,
-    m.number_newspaper
-FROM
-    printing_house ph
-JOIN
-    newspaper np ON np.id = ph.id
-JOIN
-    main m ON m.id = np.id;
+SELECT n.id, n.title, n.edition_code, n.price, n.full_name, n.printing_house, ph.addr AS printing_house_addr, n.number
+FROM newspaper n
+LEFT JOIN printing_house ph ON n.printing_house = ph.id;
 
 -- Почта
-SELECT 
-    m.id,
-    m.addr AS main_addr,
-    m.number_newspaper,
-    np.title AS newspaper_title
+SELECT m.id, m.addr, m.number_newspaper, m.newspaper_id, n.title AS newspaper_title
 FROM main m
-JOIN newspaper np ON m.id = np.id
+LEFT JOIN newspaper n ON m.newspaper_id = n.id;
+
