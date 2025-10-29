@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 
 using SqlCommand = Microsoft.Data.SqlClient.SqlCommand;
@@ -258,5 +261,83 @@ namespace mailRu
             }
         }
 
+        private void SearchAndFillDataGridView(string tableName, string keyword, DataGridView dgv)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentException("Таблица должна быть задана");
+
+            var conn = sqlConnector.GetConnection();
+
+            // Получаем текстовые и числовые столбцы
+            var columnQuery = @"
+        SELECT COLUMN_NAME, DATA_TYPE
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = @tableName";
+
+            var columnCmd = new SqlCommand(columnQuery, conn);
+            columnCmd.Parameters.AddWithValue("@tableName", tableName);
+
+            var reader = columnCmd.ExecuteReader();
+            var textColumns = new List<string>();
+            var numericColumns = new List<string>();
+
+            while (reader.Read())
+            {
+                string colName = reader.GetString(0);
+                string dataType = reader.GetString(1).ToLower();
+
+                if (new[] { "char", "varchar", "nchar", "nvarchar", "text", "ntext" }.Contains(dataType))
+                    textColumns.Add(colName);
+                else if (new[] { "int", "bigint", "smallint", "tinyint", "decimal", "numeric", "float", "real" }.Contains(dataType))
+                    numericColumns.Add(colName);
+            }
+            reader.Close();
+
+            if (textColumns.Count == 0 && numericColumns.Count == 0)
+                throw new Exception($"В таблице {tableName} нет поддерживаемых для поиска колонок");
+
+            string sql;
+            var conditions = new List<string>();
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                sql = $"SELECT * FROM {tableName}";
+            }
+            else
+            {
+                // LIKE для текстовых столбцов
+                conditions.AddRange(textColumns.Select(c => $"{c} LIKE @keyword"));
+
+                // Попытка распарсить ключевое слово в число
+                if (decimal.TryParse(keyword, out var numericValue))
+                {
+                    // Для числовых столбцов ищем точное совпадение
+                    conditions.AddRange(numericColumns.Select(c => $"{c} = @numericValue"));
+                }
+
+                sql = $"SELECT * FROM {tableName} WHERE " + string.Join(" OR ", conditions);
+            }
+
+            using (var searchCmd = new SqlCommand(sql, conn))
+            {
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    searchCmd.Parameters.AddWithValue("@keyword", $"%{keyword}%");
+                    if (decimal.TryParse(keyword, out var numericValue))
+                        searchCmd.Parameters.AddWithValue("@numericValue", numericValue);
+                }
+
+                var adapter = new SqlDataAdapter(searchCmd);
+                var resultTable = new DataTable();
+                adapter.Fill(resultTable);
+
+                dgv.DataSource = resultTable;
+            }
+        }
+
+        private void commandLine_TextChanged(object sender, EventArgs e)
+        {
+            SearchAndFillDataGridView(buttosList.SelectedItem?.ToString(), commandLine.Text, dataGridView1);
+        }
     }
 }

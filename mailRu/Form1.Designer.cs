@@ -90,9 +90,9 @@
             // 
             this.buttosList.FormattingEnabled = true;
             this.buttosList.Items.AddRange(new object[] {
-            "Mail",
-            "Print House",
-            "Newspapers"});
+            "main",
+            "printing_house",
+            "newspaper"});
             this.buttosList.Location = new System.Drawing.Point(3, 3);
             this.buttosList.Name = "buttosList";
             this.buttosList.Size = new System.Drawing.Size(196, 342);
@@ -137,6 +137,7 @@
             this.commandLine.Size = new System.Drawing.Size(583, 24);
             this.commandLine.TabIndex = 4;
             this.commandLine.Text = "";
+            this.commandLine.TextChanged += new System.EventHandler(this.commandLine_TextChanged);
             // 
             // update
             // 
