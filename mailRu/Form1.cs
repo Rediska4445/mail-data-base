@@ -24,34 +24,34 @@ namespace mailRu
         {
             InitializeComponent();
 
-            dataGridView1.RowsAdded += dataGridView1_RowValidated;
+            //dataGridView1.RowsAdded += dataGridView1_RowValidated;
 
             sqlConnector = new SqlConnector();
             sqlConnector.Open();
             sqlConnector.Push("USE Mail;", null);
         }
 
-        private void dataGridView1_RowValidated(object sender, DataGridViewRowsAddedEventArgs e)
-        {
-            var table = (DataTable)dataGridView1.DataSource;
-            var changedRows = table.GetChanges();
+        //private void dataGridView1_RowValidated(object sender, DataGridViewRowsAddedEventArgs e)
+        //{
+        //    var table = (DataTable)dataGridView1.DataSource;
+        //    var changedRows = table.GetChanges();
 
-            if (changedRows != null)
-            {
-                foreach (DataRow row in changedRows.Rows)
-                {
-                    if (row.RowState == DataRowState.Added)
-                    {
-                        switch(buttosList.SelectedIndex)
-                        {
-                            case 0:
-                                AddNewMain((DataTable)dataGridView1.DataSource, AddNewMain);
-                                break;
-                        }
-                    }
-                }
-            }
-        }
+        //    if (changedRows != null)
+        //    {
+        //        foreach (DataRow row in changedRows.Rows)
+        //        {
+        //            if (row.RowState == DataRowState.Added)
+        //            {
+        //                switch(buttosList.SelectedIndex)
+        //                {
+        //                    case 0:
+        //                        AddNewMain((DataTable)dataGridView1.DataSource, AddNewMain);
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         private void ExecuteInTransaction(Action<SqlConnection, SqlTransaction> action)
         {
