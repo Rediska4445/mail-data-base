@@ -6,16 +6,35 @@ using System.Linq;
 
 namespace mailRu
 {
+    /// <summary>
+    /// Класс <c>SqlConnectorService</c> предоставляет методы для управления данными в базе.
+    /// Отвечает за операции добавления новых записей, обновления существующих,
+    /// сохранения изменений в транзакциях и поиска с фильтрацией по таблицам базы данных.
+    /// </summary>
     internal class SqlConnectorService
     {
+        /// <summary>
+        /// Внутренний экземпляр класса SqlConnector, управляющий соединением с базой данных.
+        /// </summary>
         private readonly SqlConnector sqlConnector;
 
+        /// <summary>
+        /// Конструктор, инициализирующий сервис с указанным экземпляром <see cref="SqlConnector"/>.
+        /// Открывает соединение с базой данных.
+        /// </summary>
+        /// <param name="connector">Экземпляр <see cref="SqlConnector"/> для работы с базой.</param>
         public SqlConnectorService(SqlConnector connector)
         {
             sqlConnector = connector;
             sqlConnector.Open();
         }
 
+        /// <summary>
+        /// Выполняет вставку новой записи в базу внутри транзакции.
+        /// </summary>
+        /// <param name="row">Строка данных для вставки.</param>
+        /// <param name="insertSql">SQL-запрос вставки.</param>
+        /// <param name="setParameters">Делегат, задающий параметры команды на основе строки данных.</param>
         private void ExecuteInsert(DataRow row, string insertSql, Action<SqlCommand> setParameters)
         {
             var conn = sqlConnector.GetConnection();
@@ -39,6 +58,11 @@ namespace mailRu
             }
         }
 
+        /// <summary>
+        /// Добавляет новую почтовую запись (main) в базу.
+        /// Должен использоваться как ссылка для метода <c>SaveChanges</c>
+        /// </summary>
+        /// <param name="row">Данные новой почтовой записи.</param>
         public void AddNewMail(DataRow row)
         {
             string insertSql =
@@ -53,6 +77,11 @@ namespace mailRu
             });
         }
 
+        /// <summary>
+        /// Добавляет новую запись в таблицу газет (newspaper).
+        /// Должен использоваться как ссылка для метода <c>SaveChanges</c>
+        /// </summary>
+        /// <param name="row">Данные газеты.</param>
         public void AddNewNewspaper(DataRow row)
         {
             string insertSql = @"
@@ -73,6 +102,11 @@ namespace mailRu
             });
         }
 
+        /// <summary>
+        /// Добавляет новую типографию (printing_house) в базу.
+        /// Должен использоваться как ссылка для метода <c>SaveChanges</c>
+        /// </summary>
+        /// <param name="row">Данные типографии.</param>
         public void AddNewPrintingHouse(DataRow row)
         {
             string insertSql = "INSERT INTO printing_house (id, addr) VALUES (@id, @addr)";
@@ -84,6 +118,13 @@ namespace mailRu
             });
         }
 
+        /// <summary>
+        /// Обновляет существующую запись в таблице main (почта).
+        /// Должен использоваться как ссылка для метода <c>SaveChanges</c>
+        /// </summary>
+        /// <param name="conn">Активное соединение с базой данных.</param>
+        /// <param name="transaction">Активная транзакция БД.</param>
+        /// <param name="row">Строка с новыми данными для обновления.</param>
         public void UpdateMail(SqlConnection conn, SqlTransaction transaction, DataRow row)
         {
             using (var cmd = new SqlCommand(
@@ -97,6 +138,13 @@ namespace mailRu
             }
         }
 
+        /// <summary>
+        /// Обновляет запись в таблице newspaper (газеты).
+        /// Должен использоваться как ссылка для метода <c>SaveChanges</c>
+        /// </summary>
+        /// <param name="conn">Активное соединение с базой данных.</param>
+        /// <param name="transaction">Активная транзакция БД.</param>
+        /// <param name="row">Строка с новыми данными для обновления.</param>
         public void UpdateNewspaper(SqlConnection conn, SqlTransaction transaction, DataRow row)
         {
             using (var cmd = new SqlCommand(
@@ -120,6 +168,13 @@ namespace mailRu
             }
         }
 
+        /// <summary>
+        /// Обновляет запись в таблице printing_house (типографии).
+        /// Должен использоваться как ссылка для метода <c>SaveChanges</c>
+        /// </summary>
+        /// <param name="conn">Активное соединение с базой данных.</param>
+        /// <param name="transaction">Активная транзакция БД.</param>
+        /// <param name="row">Строка с новыми данными для обновления.</param>
         public void UpdatePrintingHouse(SqlConnection conn, SqlTransaction transaction, DataRow row)
         {
             using (var cmd = new SqlCommand(
@@ -131,6 +186,11 @@ namespace mailRu
             }
         }
 
+        /// <summary>
+        /// Сохраняет изменения в объединённой таблице данных, вызывая переданный метод обновления для каждой изменённой строки.
+        /// </summary>
+        /// <param name="combinedTable">Объединённая таблица с изменениями.</param>
+        /// <param name="updateAction">Делегат метода обновления записи в базе.</param>
         public void SaveChanges(DataTable combinedTable, Action<SqlConnection, SqlTransaction, DataRow> updateAction)
         {
             var changedRows = combinedTable.GetChanges();
@@ -159,6 +219,14 @@ namespace mailRu
             }
         }
 
+        /// <summary>
+        /// Выполняет поиск записей в таблице базы с возможностью фильтрации по ключевому слову.
+        /// Автоматически выбирает столбцы для текстового и числового поиска по типам данных.
+        /// </summary>
+        /// <param name="tableName">Имя таблицы для поиска.</param>
+        /// <param name="keyword">Ключевое слово для фильтрации.</param>
+        /// <param name="error">Выходной параметр с описанием ошибки при выполнении запроса, если возникла.</param>
+        /// <returns>Таблица с результатами поиска или null при ошибке.</returns>
         public DataTable SearchAndFillDataGridView(string tableName, string keyword, out Exception error)
         {
             error = null;

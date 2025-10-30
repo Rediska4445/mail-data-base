@@ -1,11 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data;
-using System.Linq;
 using System.Windows.Forms;
 
-using SqlCommand = Microsoft.Data.SqlClient.SqlCommand;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 using SqlTransaction = Microsoft.Data.SqlClient.SqlTransaction;
 
@@ -47,7 +43,12 @@ namespace mailRu
 
         private void buttosList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch(buttosList.SelectedIndex)
+            UpdateDataGridView();
+        }
+
+        private void UpdateDataGridView()
+        {
+            switch (buttosList.SelectedIndex)
             {
                 case 0:
                     updateView("SELECT m.id, m.addr, m.number_newspaper, m.newspaper_id, n.title AS newspaper_title\r\nFROM main m\r\nLEFT JOIN newspaper n ON m.newspaper_id = n.id;\r\n",
@@ -60,14 +61,14 @@ namespace mailRu
                     );
                     break;
                 case 2:
-                    updateView("SELECT n.id, n.title, n.edition_code, n.price, n.full_name, n.printing_house, ph.addr AS printing_house_addr, n.number\r\nFROM newspaper n\r\nLEFT JOIN printing_house ph ON n.printing_house = ph.id;", 
+                    updateView("SELECT n.id, n.title, n.edition_code, n.price, n.full_name, n.printing_house, ph.addr AS printing_house_addr, n.number\r\nFROM newspaper n\r\nLEFT JOIN printing_house ph ON n.printing_house = ph.id;",
                         dataGridView1
                     );
                     break;
             }
         }
 
-        public void updateView(string sql, DataGridView dataGridView1)
+        private void updateView(string sql, DataGridView dataGridView1)
         {
             dataGridView1.DataSource = sqlConnector.Fill(sql);
         }
@@ -148,9 +149,81 @@ namespace mailRu
             }
         }
 
+        private int GetSelectedIdFromDataGrid()
+        {
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                object cellValue = selectedRow.Cells["id"].Value;
+                if (cellValue != null && int.TryParse(cellValue.ToString(), out int id))
+                {
+                    return id;
+                }
+            }
+            else if (dataGridView1.CurrentRow != null)
+            {
+                object cellValue = dataGridView1.CurrentRow.Cells["id"].Value;
+                if (cellValue != null && int.TryParse(cellValue.ToString(), out int id))
+                {
+                    return id;
+                }
+            }
+
+            throw new InvalidOperationException("Не выбрана строка или столбец 'id' отсутствует или содержит неверное значение");
+        }
+
         private void remove_Click(object sender, EventArgs e)
         {
+            switch (buttosList.SelectedIndex)
+            {
+                // Почта (main)
+                case 0:
+                    {
+                        var idToDelete = GetSelectedIdFromDataGrid(); // Ваш метод получить выбранный ID из dataGridView1
 
+                        // Просто удаляем строку из main по id
+                        sqlConnector.Push("DELETE FROM main WHERE id = @id", cmd =>
+                        {
+                            cmd.Parameters.AddWithValue("@id", idToDelete);
+                        });
+                    }
+                    break;
+
+                // Типография (printing_house)
+                case 1:
+                    {
+                        var idToDelete = GetSelectedIdFromDataGrid();
+
+                        // Удаляем сначала все main, связанные с газетами из данной типографии
+                        sqlConnector.Push(@"
+                    DELETE main 
+                    WHERE newspaper_id IN 
+                    (SELECT id FROM newspaper WHERE printing_house = @id);
+                    DELETE newspaper WHERE printing_house = @id;
+                    DELETE printing_house WHERE id = @id;", cmd =>
+                        {
+                            cmd.Parameters.AddWithValue("@id", idToDelete);
+                        });
+                    }
+                    break;
+
+                // Газетка (newspaper)
+                case 2:
+                    {
+                        var idToDelete = GetSelectedIdFromDataGrid();
+
+                        // Удаляем сначала все main, связанные с газетой, потом саму газету
+                        sqlConnector.Push(@"
+                    DELETE FROM main WHERE newspaper_id = @id;
+                    DELETE FROM newspaper WHERE id = @id;", cmd =>
+                        {
+                            cmd.Parameters.AddWithValue("@id", idToDelete);
+                        });
+                    }
+                    break;
+            }
+
+            UpdateDataGridView();
         }
     }
 }
