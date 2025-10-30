@@ -263,6 +263,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlConnector.cs" />
+    <Compile Include="SqlConnectorService.cs" />
+    <Compile Include="SqlConnectorServiceTests.cs" />
     <Compile Include="SqlConnectorTests.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

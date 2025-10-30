@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using mailRu;
 using System.Data;
-using Mysqlx.Crud;
 using System;
 using Moq;
 using Microsoft.Data.SqlClient;

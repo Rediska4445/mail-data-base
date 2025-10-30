@@ -147,7 +147,7 @@
             // 
             this.console.Location = new System.Drawing.Point(15, 407);
             this.console.Name = "console";
-            this.console.Size = new System.Drawing.Size(202, 114);
+            this.console.Size = new System.Drawing.Size(196, 114);
             this.console.TabIndex = 2;
             this.console.Text = "";
             // 
