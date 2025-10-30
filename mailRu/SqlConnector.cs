@@ -27,25 +27,32 @@ namespace mailRu
         public DataTable Fill(string sql)
         {
             DataTable table = new DataTable();
-            SqlDataAdapter adapter = new SqlDataAdapter(sql, connection);
 
-            adapter.Fill(table);
+            if (connection.State != ConnectionState.Open)
+                Open();
+
+            if(connection.State == ConnectionState.Open)
+            {
+                SqlDataAdapter adapter = new SqlDataAdapter(sql, connection);
+
+                adapter.Fill(table);
+            }
 
             return table;
         }
 
         public void Open()
         {
-            if(connection.State != ConnectionState.Open)
+            if (connection.State != ConnectionState.Open)
                 connection.Open();
 
-            if(onOpen != null) 
+            if (onOpen != null)
                 onOpen(connection);
         }
 
         public void Close()
         {
-            if(connection.State != ConnectionState.Closed)
+            if (connection.State != ConnectionState.Closed)
                 connection.Close();
 
             if (onClose != null)
@@ -81,7 +88,7 @@ namespace mailRu
 
             using (SqlCommand command = new SqlCommand(sql, connection))
             {
-                if(configureCommand != null) 
+                if (configureCommand != null)
                     configureCommand(command);
 
                 command.ExecuteNonQuery();

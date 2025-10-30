@@ -46,37 +46,13 @@ namespace mailRu
 
         private void dataGridView1_RowValidated(object sender, DataGridViewRowsAddedEventArgs e)
         {
-            var table = (DataTable)dataGridView1.DataSource;
-            var changedRows = table.GetChanges();
 
-            if (changedRows != null)
-            {
-                foreach (DataRow row in changedRows.Rows)
-                {
-                    if (row.RowState == DataRowState.Added)
-                    {
-                        console.Text += "ed";
-
-                        switch (buttosList.SelectedIndex)
-                        {
-                            case 0:
-                                AddNewMain(row);
-                                break;
-                            case 1:
-                                AddNewPrintingHouse(row);
-                                break;
-                            case 2:
-                                AddNewNewspaper(row);
-                                break;
-                        }
-                    }
-                }
-            }
         }
 
         private void AddNewMain(DataRow row)
         {
-            string insertSql = "INSERT INTO main (addr, newspaper_id, number_newspaper, id) VALUES (@addr, @newspaper_id, @number_newspaper, @id)";
+            string insertSql = "INSERT INTO main (addr, newspaper_id, number_newspaper, id) VALUES " +
+                "(@addr, @newspaper_id, @number_newspaper, @id)";
             ExecuteInsert(row, insertSql, cmd =>
             {
                 cmd.Parameters.AddWithValue("@addr", row["addr"]);
@@ -106,7 +82,6 @@ namespace mailRu
             });
         }
 
-
         private void AddNewPrintingHouse(DataRow row)
         {
             string insertSql = "INSERT INTO printing_house (id, addr) VALUES (@id, @addr)";
@@ -119,25 +94,24 @@ namespace mailRu
 
         private void ExecuteInsert(DataRow row, string insertSql, Action<SqlCommand> setParameters)
         {
-            using (var conn = sqlConnector.GetConnection())
-            {
-                using (var transaction = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        using (var cmd = new SqlCommand(insertSql, conn, transaction))
-                        {
-                            setParameters(cmd);
-                            cmd.ExecuteNonQuery();
-                        }
+            var conn = sqlConnector.GetConnection();
 
-                        transaction.Commit();
-                    }
-                    catch (Exception ex)
+            using (var transaction = conn.BeginTransaction())
+            {
+                try
+                {
+                    using (var cmd = new SqlCommand(insertSql, conn, transaction))
                     {
-                        transaction.Rollback();
-                        MessageBox.Show("Ошибка при добавлении записи: " + Environment.NewLine + ex.Message);
+                        setParameters(cmd);
+                        cmd.ExecuteNonQuery();
                     }
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    MessageBox.Show("Ошибка при добавлении записи: " + Environment.NewLine + ex.Message);
                 }
             }
         }
@@ -242,22 +216,40 @@ namespace mailRu
 
         public void updateView(string sql, DataGridView dataGridView1)
         {
+            console.Text += sqlConnector.GetConnection().State;
+
             dataGridView1.DataSource = sqlConnector.Fill(sql);
+
+            console.Text += sqlConnector.GetConnection().State;
         }
 
         private void save_Click(object sender, EventArgs e1)
         {
-            switch (buttosList.SelectedIndex)
+            var table = (DataTable)dataGridView1.DataSource;
+            var changedRows = table.GetChanges();
+
+            if (changedRows != null)
             {
-                case 0:
-                    SaveChanges((DataTable) dataGridView1.DataSource, UpdateMain);
-                    break;
-                case 1:
-                    SaveChanges((DataTable)dataGridView1.DataSource, UpdatePrintingHouse);
-                    break;
-                case 2:
-                    SaveChanges((DataTable)dataGridView1.DataSource, UpdateNewspaper);
-                    break;
+                foreach (DataRow row in changedRows.Rows)
+                {
+                    if (row.RowState == DataRowState.Added)
+                    {
+                        console.Text += "ed";
+
+                        switch (buttosList.SelectedIndex)
+                        {
+                            case 0:
+                                AddNewMain(row);
+                                break;
+                            case 1:
+                                AddNewPrintingHouse(row);
+                                break;
+                            case 2:
+                                AddNewNewspaper(row);
+                                break;
+                        }
+                    }
+                }
             }
         }
 
@@ -268,11 +260,10 @@ namespace mailRu
 
             var conn = sqlConnector.GetConnection();
 
-            // Получаем текстовые и числовые столбцы
             var columnQuery = @"
-        SELECT COLUMN_NAME, DATA_TYPE
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_NAME = @tableName";
+                SELECT COLUMN_NAME, DATA_TYPE
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = @tableName";
 
             var columnCmd = new SqlCommand(columnQuery, conn);
             columnCmd.Parameters.AddWithValue("@tableName", tableName);
@@ -305,13 +296,10 @@ namespace mailRu
             }
             else
             {
-                // LIKE для текстовых столбцов
                 conditions.AddRange(textColumns.Select(c => $"{c} LIKE @keyword"));
 
-                // Попытка распарсить ключевое слово в число
                 if (decimal.TryParse(keyword, out var numericValue))
                 {
-                    // Для числовых столбцов ищем точное совпадение
                     conditions.AddRange(numericColumns.Select(c => $"{c} = @numericValue"));
                 }
 
@@ -323,6 +311,7 @@ namespace mailRu
                 if (!string.IsNullOrEmpty(keyword))
                 {
                     searchCmd.Parameters.AddWithValue("@keyword", $"%{keyword}%");
+
                     if (decimal.TryParse(keyword, out var numericValue))
                         searchCmd.Parameters.AddWithValue("@numericValue", numericValue);
                 }
@@ -338,6 +327,27 @@ namespace mailRu
         private void commandLine_TextChanged(object sender, EventArgs e)
         {
             SearchAndFillDataGridView(buttosList.SelectedItem?.ToString(), commandLine.Text, dataGridView1);
+        }
+
+        private void update_Click(object sender, EventArgs e)
+        {
+            switch (buttosList.SelectedIndex)
+            {
+                case 0:
+                    SaveChanges((DataTable)dataGridView1.DataSource, UpdateMain);
+                    break;
+                case 1:
+                    SaveChanges((DataTable)dataGridView1.DataSource, UpdatePrintingHouse);
+                    break;
+                case 2:
+                    SaveChanges((DataTable)dataGridView1.DataSource, UpdateNewspaper);
+                    break;
+            }
+        }
+
+        private void remove_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -29,16 +29,16 @@
         private void InitializeComponent()
         {
             this.left_side = new System.Windows.Forms.Panel();
-            this.right_side = new System.Windows.Forms.Panel();
-            this.console = new System.Windows.Forms.RichTextBox();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.buttosList = new System.Windows.Forms.ListBox();
             this.request = new System.Windows.Forms.RichTextBox();
-            this.save = new System.Windows.Forms.Button();
-            this.remove = new System.Windows.Forms.Button();
-            this.commandLine = new System.Windows.Forms.RichTextBox();
-            this.sqlDataAdapter1 = new Microsoft.Data.SqlClient.SqlDataAdapter();
+            this.buttosList = new System.Windows.Forms.ListBox();
+            this.right_side = new System.Windows.Forms.Panel();
             this.update = new System.Windows.Forms.Button();
+            this.commandLine = new System.Windows.Forms.RichTextBox();
+            this.remove = new System.Windows.Forms.Button();
+            this.save = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.console = new System.Windows.Forms.RichTextBox();
+            this.sqlDataAdapter1 = new Microsoft.Data.SqlClient.SqlDataAdapter();
             this.left_side.SuspendLayout();
             this.right_side.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -52,6 +52,27 @@
             this.left_side.Name = "left_side";
             this.left_side.Size = new System.Drawing.Size(202, 384);
             this.left_side.TabIndex = 0;
+            // 
+            // request
+            // 
+            this.request.Location = new System.Drawing.Point(3, 347);
+            this.request.Name = "request";
+            this.request.Size = new System.Drawing.Size(196, 34);
+            this.request.TabIndex = 3;
+            this.request.Text = "";
+            // 
+            // buttosList
+            // 
+            this.buttosList.FormattingEnabled = true;
+            this.buttosList.Items.AddRange(new object[] {
+            "main",
+            "printing_house",
+            "newspaper"});
+            this.buttosList.Location = new System.Drawing.Point(3, 3);
+            this.buttosList.Name = "buttosList";
+            this.buttosList.Size = new System.Drawing.Size(196, 342);
+            this.buttosList.TabIndex = 1;
+            this.buttosList.SelectedIndexChanged += new System.EventHandler(this.buttosList_SelectedIndexChanged);
             // 
             // right_side
             // 
@@ -68,65 +89,16 @@
             this.right_side.Size = new System.Drawing.Size(589, 509);
             this.right_side.TabIndex = 1;
             // 
-            // console
+            // update
             // 
-            this.console.Location = new System.Drawing.Point(15, 407);
-            this.console.Name = "console";
-            this.console.Size = new System.Drawing.Size(202, 114);
-            this.console.TabIndex = 2;
-            this.console.Text = "";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 33);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(583, 351);
-            this.dataGridView1.TabIndex = 0;
-            // 
-            // buttosList
-            // 
-            this.buttosList.FormattingEnabled = true;
-            this.buttosList.Items.AddRange(new object[] {
-            "main",
-            "printing_house",
-            "newspaper"});
-            this.buttosList.Location = new System.Drawing.Point(3, 3);
-            this.buttosList.Name = "buttosList";
-            this.buttosList.Size = new System.Drawing.Size(196, 342);
-            this.buttosList.TabIndex = 1;
-            this.buttosList.SelectedIndexChanged += new System.EventHandler(this.buttosList_SelectedIndexChanged);
-            // 
-            // request
-            // 
-            this.request.Location = new System.Drawing.Point(3, 347);
-            this.request.Name = "request";
-            this.request.Size = new System.Drawing.Size(196, 34);
-            this.request.TabIndex = 3;
-            this.request.Text = "";
-            // 
-            // save
-            // 
-            this.save.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.save.Location = new System.Drawing.Point(13, 473);
-            this.save.Name = "save";
-            this.save.Size = new System.Drawing.Size(564, 33);
-            this.save.TabIndex = 1;
-            this.save.Text = "Insert";
-            this.save.UseVisualStyleBackColor = true;
-            this.save.Click += new System.EventHandler(this.save_Click);
-            // 
-            // remove
-            // 
-            this.remove.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.remove.Location = new System.Drawing.Point(13, 434);
-            this.remove.Name = "remove";
-            this.remove.Size = new System.Drawing.Size(564, 33);
-            this.remove.TabIndex = 2;
-            this.remove.Text = "Remove";
-            this.remove.UseVisualStyleBackColor = true;
+            this.update.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.update.Location = new System.Drawing.Point(13, 395);
+            this.update.Name = "update";
+            this.update.Size = new System.Drawing.Size(564, 33);
+            this.update.TabIndex = 5;
+            this.update.Text = "Update";
+            this.update.UseVisualStyleBackColor = true;
+            this.update.Click += new System.EventHandler(this.update_Click);
             // 
             // commandLine
             // 
@@ -139,15 +111,45 @@
             this.commandLine.Text = "";
             this.commandLine.TextChanged += new System.EventHandler(this.commandLine_TextChanged);
             // 
-            // update
+            // remove
             // 
-            this.update.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.update.Location = new System.Drawing.Point(13, 395);
-            this.update.Name = "update";
-            this.update.Size = new System.Drawing.Size(564, 33);
-            this.update.TabIndex = 5;
-            this.update.Text = "Update";
-            this.update.UseVisualStyleBackColor = true;
+            this.remove.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.remove.Location = new System.Drawing.Point(13, 434);
+            this.remove.Name = "remove";
+            this.remove.Size = new System.Drawing.Size(564, 33);
+            this.remove.TabIndex = 2;
+            this.remove.Text = "Remove";
+            this.remove.UseVisualStyleBackColor = true;
+            this.remove.Click += new System.EventHandler(this.remove_Click);
+            // 
+            // save
+            // 
+            this.save.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.save.Location = new System.Drawing.Point(13, 473);
+            this.save.Name = "save";
+            this.save.Size = new System.Drawing.Size(564, 33);
+            this.save.TabIndex = 1;
+            this.save.Text = "Insert";
+            this.save.UseVisualStyleBackColor = true;
+            this.save.Click += new System.EventHandler(this.save_Click);
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(3, 33);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(583, 351);
+            this.dataGridView1.TabIndex = 0;
+            // 
+            // console
+            // 
+            this.console.Location = new System.Drawing.Point(15, 407);
+            this.console.Name = "console";
+            this.console.Size = new System.Drawing.Size(202, 114);
+            this.console.TabIndex = 2;
+            this.console.Text = "";
             // 
             // Form1
             // 
