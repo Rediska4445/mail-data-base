@@ -220,7 +220,7 @@
             this.Controls.Add(this.right_side);
             this.Controls.Add(this.left_side);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "MailExplorer";
             this.left_side.ResumeLayout(false);
             this.left_side.PerformLayout();
             this.right_side.ResumeLayout(false);

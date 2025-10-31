@@ -13,6 +13,8 @@ namespace mailRu
         private SqlConnector sqlConnector;
         private SqlConnectorService sqlService;
 
+        private const string mainDb = "MailTest";
+
         public Form1()
         {
             InitializeComponent();
@@ -21,15 +23,72 @@ namespace mailRu
 
             sqlConnector = new SqlConnector();
             sqlConnector.Open();
-            console.Text += $"[{DateTime.Now}] Подключение к базе открыто.\r\n";
 
-            sqlConnector.Push("USE Mail;", null);
-            console.Text += $"[{DateTime.Now}] Используется база Mail.\r\n";
+            console.Text += $"[{DateTime.Now}] Подключение к серверу SQL открыто.\r\n";
 
-            sqlService = new SqlConnectorService(sqlConnector);
+            try
+            {
+                var checkDbSql = $"SELECT database_id FROM sys.databases WHERE Name = '{mainDb}'";
+                var dt = sqlConnector.Fill(checkDbSql);
 
-            this.dataGridView1.DataError += new DataGridViewDataErrorEventHandler(dataGridView1_DataError);
-            console.Text += $"[{DateTime.Now}] Подписка на событие DataError завершена.\r\n";
+                if (dt.Rows.Count == 0)
+                {
+                    console.Text += $"[{DateTime.Now}] База {mainDb} не найдена. Создаём базу...\r\n";
+
+                    sqlConnector.Push($"CREATE DATABASE {mainDb};", null);
+                    console.Text += $"[{DateTime.Now}] База {mainDb} успешно создана.\r\n";
+                }
+                else
+                {
+                    console.Text += $"[{DateTime.Now}] База {mainDb} существует.\r\n";
+                }
+
+                sqlConnector.Push($"USE {mainDb};", null);
+                console.Text += $"[{DateTime.Now}] Используется база {mainDb}.\r\n";
+
+                sqlConnector.Push(@"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='printing_house' and xtype='U')
+                    CREATE TABLE printing_house (
+                        id INT PRIMARY KEY NOT NULL,
+                        addr VARCHAR(96)
+                    );", null);
+                console.Text += $"[{DateTime.Now}] Создание таблицы printing_house (если отсутствует).\r\n";
+
+                sqlConnector.Push(@"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='newspaper' and xtype='U')
+                    CREATE TABLE newspaper (
+                        id INT PRIMARY KEY NOT NULL,
+                        title VARCHAR(64),
+                        edition_code VARCHAR(64),
+                        price INT NOT NULL,
+                        full_name VARCHAR(96) NOT NULL,
+                        printing_house INT NULL,
+                        number INT,
+                        CONSTRAINT FK_newspaper_printing_house FOREIGN KEY (printing_house) REFERENCES printing_house(id)
+                    );", null);
+                console.Text += $"[{DateTime.Now}] Создание таблицы newspaper (если отсутствует).\r\n";
+
+                sqlConnector.Push(@"
+                IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='main' and xtype='U')
+                CREATE TABLE main (
+                    id INT PRIMARY KEY NOT NULL,
+                    addr VARCHAR(96),
+                    newspaper_id INT,
+                    number_newspaper INT,
+                    CONSTRAINT FK_main_newspaper FOREIGN KEY (newspaper_id) REFERENCES newspaper(id)
+                );", null);
+                console.Text += $"[{DateTime.Now}] Создание таблицы main (если отсутствует).\r\n";
+
+                sqlService = new SqlConnectorService(sqlConnector);
+
+                this.dataGridView1.DataError += new DataGridViewDataErrorEventHandler(dataGridView1_DataError);
+                console.Text += $"[{DateTime.Now}] Подписка на событие DataError завершена.\r\n";
+            }
+            catch (Exception ex)
+            {
+                console.Text += $"[{DateTime.Now}] Ошибка при инициализации базы данных: {ex.Message}\r\n";
+                MessageBox.Show("Ошибка при работе с базой данных: " + ex.Message);
+            }
         }
 
         private void dataGridView1_DataError(object sender, DataGridViewDataErrorEventArgs e)
