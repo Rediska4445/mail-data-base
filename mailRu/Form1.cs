@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Windows.Forms;
 
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
@@ -8,6 +9,39 @@ using SqlTransaction = Microsoft.Data.SqlClient.SqlTransaction;
 
 namespace mailRu
 {
+    public class KeyValueFileReader
+    {
+        private readonly Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+
+        public KeyValueFileReader(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            foreach (var line in File.ReadAllLines(filePath))
+            {
+                if (string.IsNullOrWhiteSpace(line) || !line.Contains("="))
+                    continue;
+
+                int index = line.IndexOf('=');
+                string key = line.Substring(0, index).Trim();
+                string value = line.Substring(index + 1).Trim();
+
+                if (!keyValuePairs.ContainsKey(key))
+                {
+                    keyValuePairs.Add(key, value);
+                }
+            }
+        }
+
+        public bool TryGetValue(string key, out string value)
+        {
+            return keyValuePairs.TryGetValue(key, out value);
+        }
+    }
+
     public partial class Form1 : Form
     {
         private SqlConnector sqlConnector;
@@ -21,7 +55,19 @@ namespace mailRu
 
             console.Text += $"[{DateTime.Now}] Инициализация Form1...\r\n";
 
-            sqlConnector = new SqlConnector();
+            var reader = new KeyValueFileReader("myConfig.txt");
+
+            if (reader.TryGetValue("connectionString", out string connectionString))
+            {
+                console.Text += $"[{DateTime.Now}] Строка подключения загружена из myConfig.txt.\r\n";
+                sqlConnector = new SqlConnector(connectionString);
+            }
+            else
+            {
+                console.Text += $"[{DateTime.Now}] Не найдена строка подключения в myConfig.txt, используется стандартная.\r\n";
+                sqlConnector = new SqlConnector(); 
+            }
+
             sqlConnector.Open();
 
             console.Text += $"[{DateTime.Now}] Подключение к серверу SQL открыто.\r\n";
