@@ -47,7 +47,9 @@ namespace mailRu
         private SqlConnector sqlConnector;
         private SqlConnectorService sqlService;
 
-        private const string mainDb = "MailTest";
+        public static string mainDb = "MailTest";
+        public static string mainDbConnectionString = null;
+        public static string configPath = "myConfig.txt";
 
         public Form1()
         {
