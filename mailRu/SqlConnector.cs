@@ -6,10 +6,40 @@ namespace mailRu
 {
     /// <author>Автор: https://github.com/Rediska4445</author>
     /// <summary>
+    /// Представляет интерфейс обёртки для подключения к SQL Server и выполнения основных операций с базой данных.
+    /// Предоставляет заголовки методов открытия/закрытия соединения, 
+    /// выполнения запросов и обработки событий ключевых операций.
+    /// </summary>
+    public interface ISqlConnector
+    {
+        /// <summary>
+        /// Открывает соединение с базой данных.
+        /// </summary>
+        void Open();
+        /// <summary>
+        /// Закрывает соединение.
+        /// </summary>
+        void Close();
+        /// <summary>
+        /// Выполняет оператор INSERT/UPDATE/DELETE.
+        /// </summary>
+        /// <param name="sql">SQL-команда</param>
+        /// <param name="configureCommand">Лямбда для настройки SqlCommand (например, добавление параметров)</param>
+        void Push(string sql, Action<SqlCommand> configureCommand);
+        /// <summary>
+        /// Выполняет оператор SELECT и вызывает переданную лямбду для обработки каждой строки.
+        /// </summary>
+        /// <param name="sql">SQL-запрос для чтения</param>
+        /// <param name="processRow">Лямбда, которая обрабатывает каждую строку</param>
+        void Read(string sql, Action<SqlDataReader> processRow);
+    }
+
+    /// <author>Автор: https://github.com/Rediska4445</author>
+    /// <summary>
     /// Представляет обёртку для подключения к SQL Server и выполнения основных операций с базой данных.
     /// Предоставляет методы открытия/закрытия соединения, выполнения запросов и обработки событий ключевых операций.
     /// </summary>
-    internal class SqlConnector
+    public class SqlConnector : ISqlConnector
     {
         /// <summary>
         /// Строка подключения к базе данных.

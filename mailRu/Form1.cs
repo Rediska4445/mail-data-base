@@ -9,39 +9,6 @@ using SqlTransaction = Microsoft.Data.SqlClient.SqlTransaction;
 
 namespace mailRu
 {
-    public class KeyValueFileReader
-    {
-        private readonly Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-
-        public KeyValueFileReader(string filePath)
-        {
-            if (!File.Exists(filePath))
-            {
-                return;
-            }
-
-            foreach (var line in File.ReadAllLines(filePath))
-            {
-                if (string.IsNullOrWhiteSpace(line) || !line.Contains("="))
-                    continue;
-
-                int index = line.IndexOf('=');
-                string key = line.Substring(0, index).Trim();
-                string value = line.Substring(index + 1).Trim();
-
-                if (!keyValuePairs.ContainsKey(key))
-                {
-                    keyValuePairs.Add(key, value);
-                }
-            }
-        }
-
-        public bool TryGetValue(string key, out string value)
-        {
-            return keyValuePairs.TryGetValue(key, out value);
-        }
-    }
-
     public partial class Form1 : Form
     {
         private SqlConnector sqlConnector;
@@ -433,6 +400,39 @@ namespace mailRu
 
                 console.Text += $"[{DateTime.Now}] Выполнение запроса завершено.\r\n";
             }
+        }
+    }
+
+    public class KeyValueFileReader
+    {
+        private readonly Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+
+        public KeyValueFileReader(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            foreach (var line in File.ReadAllLines(filePath))
+            {
+                if (string.IsNullOrWhiteSpace(line) || !line.Contains("="))
+                    continue;
+
+                int index = line.IndexOf('=');
+                string key = line.Substring(0, index).Trim();
+                string value = line.Substring(index + 1).Trim();
+
+                if (!keyValuePairs.ContainsKey(key))
+                {
+                    keyValuePairs.Add(key, value);
+                }
+            }
+        }
+
+        public bool TryGetValue(string key, out string value)
+        {
+            return keyValuePairs.TryGetValue(key, out value);
         }
     }
 }
