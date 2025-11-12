@@ -1,7 +1,7 @@
 # Mail-Ru: Application for mail's operations
 
 [![GitHub Release](https://img.shields.io/github/v/release/Rediska4445/mail-data-base)](https://github.com/Rediska4445/mail-data-base/releases/latest) 
-[![official VLPK](https://img.shields.io/badge/education-sql-blue.svg)](https://polcol.ru/)
+[![official VLPK](https://img.shields.io/badge/education-vlpk-orange.svg)](https://polcol.ru/)
 
 Mail-Ru is application for working with mail database.
 This application using Microsoft Sql Client and he's writed on C#/Windows Forms platform.
